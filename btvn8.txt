@@ -1,0 +1,23 @@
+Phần 1: Phân tích lỗi
+
+Cả 3 dòng lệnh đều dùng Out-File mà không có -Append. Mặc định Out-File sẽ ghi đè: mở file, xóa hết nội dung cũ rồi mới ghi nội dung mới. Vì vậy mỗi dòng lệnh xóa sạch kết quả của dòng trước nó, và lần chạy mới xóa luôn dữ liệu của các giờ trước.
+
+Dòng 1 tạo mới file (xóa lịch sử cũ) là dòng gây mất dữ liệu cũ của các lần chạy trước. Dòng 2 ghi đè dòng "Bat dau quet". Dòng 3 ghi đè toàn bộ kết quả lỗi.
+
+Sau mỗi lần chạy, file weekly_errors.txt chỉ còn đúng 1 dòng: "[ngày giờ] --- Ket thuc quet ---". Toàn bộ lịch sử và các dòng lỗi đều mất.
+
+Phần 2: Sửa lỗi và kiểm thử
+
+Script đã sửa (dòng 2 và 3 thêm -Append, dòng 1 cũng thêm -Append để không xóa lịch sử cũ):
+
+"[$(Get-Date)] --- Bat dau quet ---" | Out-File -Append weekly_errors.txt
+Select-String -Path app.log -Pattern "error" | Out-File -Append weekly_errors.txt
+"[$(Get-Date)] --- Ket thuc quet ---" | Out-File -Append weekly_errors.txt
+
+Sự khác biệt:
+
+Out-File (không có -Append): ghi đè, xóa nội dung cũ rồi ghi mới. Dùng khi muốn tạo file mới hoặc làm mới hoàn toàn.
+
+Out-File -Append: ghi nối, giữ nội dung cũ và thêm nội dung mới vào cuối file. Dùng cho log cộng dồn.
+
+Add-Content: ghi nối, giống -Append, thường dùng để thêm chuỗi văn bản đơn giản vào cuối file.
